@@ -1,4 +1,4 @@
-﻿<Window x:Class="PPECerfal.MainWindow"
+﻿<Window x:Class="PPEProjet.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Login" Height="368" Width="368" FontSize="14" Background="#04c582">
@@ -13,13 +13,12 @@
                 </TransformGroup>
             </StackPanel.RenderTransform>
             <Label Content="Connexion" Foreground="White" FontSize="25" HorizontalAlignment="Center"/>
-            <Separator/>
+            <Separator Background="#FFA0A0A0"/>
             <Label Content="Identifiant" Foreground="White"/>
             <TextBox x:Name="txtUsername" Background="#545d6a" Foreground="White" FontSize="18"/>
             <Label Content="Mot de passe" Foreground="White"/>
             <PasswordBox x:Name="txtPassword" Background="#545d6a" Foreground="White" FontSize="18"/>
-            <Button x:Name="btnSubmit" Click="btnSubmit_Click" Content="Connexion" Margin="60 10" Background="#4CAF50" Foreground="White" FontSize="18"/>
-            <Button Content="Inscription" Background="Transparent" Margin="70 5" Foreground="#4CAF50" BorderThickness="0" />
+            <Button x:Name="btnLogin" Click="btnLogin_Click" Content="Connexion" Margin="60 10" Background="#4CAF50" Foreground="White" FontSize="18"/>
         </StackPanel>
     </Border>
 </Window>

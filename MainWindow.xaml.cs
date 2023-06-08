@@ -12,8 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MySql.Data.MySqlClient;
 
-namespace PPECerfal
+
+namespace PPEProjet
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -25,42 +27,58 @@ namespace PPECerfal
             InitializeComponent();
         }
 
-        private void btnSubmit_Click(object sender, RoutedEventArgs e)
+        private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
-            //SqlConnection sqlCon = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MaBase;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
-            try
+            string username = txtUsername.Text;
+            string password = txtPassword.Password;
+            string connectionString = "Server=127.0.0.1;Database=bibliotheque;Uid=admin;Pwd='visualstudio';";
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                //  if (sqlCon.State == ConnectionState.Closed)
-                //   sqlCon.Open();
-                // String query = "SELECT COUNT(1) FROM tblUser WHERE Username=@Username AND Password=@Password";
-                // SqlCommand sqlCmd = new SqlCommand(query, sqlCon);
-                //sqlCmd.CommandType = CommandType.Text;
-                // sqlCmd.Parameters.AddWithValue("@Username",txtUsername.Text);
-                //sqlCmd.Parameters.AddWithValue("@Password", txtPassword.Password);
-                //int count = Convert.ToInt32(sqlCmd.ExecuteScalar());
-
-
-                //if (count == 1)
-                if (txtUsername.Text == "vallade")
+                try
                 {
-                    MainWindow dashboard = new MainWindow();
-                    dashboard.Show();
-                    this.Close();
+                    connection.Open();
+                    MySqlCommand command = connection.CreateCommand();
+                    command.CommandText = "SELECT * FROM utilisateurs WHERE login=@username";
+                    command.Parameters.AddWithValue("@username", username);
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string hashedPassword = Hashage.GenerateSHA256String(password).ToLower();
+                            if (hashedPassword == reader["mdp"].ToString())
+                            {
+                                MessageBox.Show("Connexion réussie !");
+                                int niveauAdmin = 2;
+                                if (niveauAdmin == int.Parse(reader["niveau"].ToString()))
+                                {
+                                    fenetreAdmin uneFenetreAdmin = new fenetreAdmin();
+                                    uneFenetreAdmin.Show();
+                                    MainWindow mainWindow = new MainWindow();
+                                    mainWindow.Close();
+                                    uneFenetreAdmin.textBlockLabelAdmin.Content = uneFenetreAdmin.textBlockLabelAdmin.Content + " " + reader["prenom"];
+                                }
+                                else
+                                {
+                                    fenetreOperateur uneFenetreOperateur = new fenetreOperateur();
+                                    uneFenetreOperateur.Show();
+                                    MainWindow mainWindow = new MainWindow();
+                                    mainWindow.Close();
+                                    uneFenetreOperateur.textBlockLabelOp.Content = uneFenetreOperateur.textBlockLabelOp.Content + " " + reader["prenom"];
+                                    reader.Close();
+                                }
+                            }
+                            else MessageBox.Show("Nom d'utilisateur ou mot de passe incorrect");
+                        }
+                        else if (username != "") MessageBox.Show("Nom d'utilisateur incorrect");
+                        else { MessageBox.Show("Veuillez remplir tout les champs"); }
+                    }
+                    
                 }
-                else
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Identifiant ou mot de passe incorrect.");
+                    MessageBox.Show(ex.Message);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            finally
-            {
-                // sqlCon.Close();
             }
         }
-
     }
 }
